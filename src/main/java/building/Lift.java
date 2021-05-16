@@ -9,7 +9,9 @@ import service.Direction;
 import java.util.*;
 
 @Slf4j
-public class Lift {
+public class Lift implements Runnable {
+
+    private boolean isInterupted;
     private final Queue<Goal> goals;
     private final int maxLoad;
     private final List<Floor> floors;
@@ -94,6 +96,11 @@ public class Lift {
 
 
     public void move() {
+        try {
+            Thread.sleep(speedOfMovement*1000);
+        } catch (InterruptedException e) {
+            log.error("лифт застрял",e);
+        }
         if (liftDirection().equals(Direction.DOWN)) moveDown();
         if (liftDirection().equals(Direction.UP)) moveUp();
     }
@@ -139,6 +146,21 @@ public class Lift {
                 ", points=" + points.size() +
                 '}';
     }
-}
 
+    @Override
+    public void run() {
+        while (!isInterupted()) {
+            onFloor();
+            move();
+        }
+    }
+
+    public boolean isInterupted() {
+        return isInterupted;
+    }
+
+    public void setInterupted(boolean interupted) {
+        isInterupted = interupted;
+    }
+}
 
