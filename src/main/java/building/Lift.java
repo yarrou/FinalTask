@@ -38,24 +38,14 @@ public class Lift {
         this.goals = goals;
     }
 
-    /*public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }*/
-
     public int getPosition() {
         return position;
     }
 
-
-
     public Optional<Goal> load(Queue<Passenger> passengerQueue) {
         while (loadOne(passengerQueue.peek())) {
             Passenger passenger = passengerQueue.poll();
-            log.warn("в лифт на {} этаже входит пассажир",position);
+            log.warn("в лифт на {} этаже входит пассажир", position);
             points.add(passenger.getRequiredFloor());
         }
         if (passengerQueue.size() > 0) {
@@ -79,15 +69,11 @@ public class Lift {
             Passenger passenger = iterator.next();
             if (passenger.getRequiredFloor() == position) {
                 iterator.remove();
-                log.warn("пассажир покинул лифт на {} этаже",position);
+                log.warn("пассажир покинул лифт на {} этаже", position);
             }
         }
     }
 
-    private boolean unloadOne(Passenger passenger) {
-        log.info("пассажир покинул лифт");
-        return passengers.remove(passenger);
-    }
 
     public void moveUp() {
         position++;
@@ -106,7 +92,6 @@ public class Lift {
             else return Direction.STOP;
         } else return Direction.STOP;
     }
-
 
 
     public void move() {
