@@ -9,9 +9,9 @@ import service.Direction;
 import java.util.*;
 
 @Slf4j
-public class Lift implements Runnable {
+public class Elevator implements Runnable {
 
-    private boolean isInterupted;
+    private boolean isInterrupted;
     private final Queue<Goal> goals;
     private final int maxLoad;
     private final List<Floor> floors;
@@ -27,7 +27,7 @@ public class Lift implements Runnable {
     }
 
 
-    public Lift(int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Queue<Goal> goals) {
+    public Elevator(int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Queue<Goal> goals) {
         this.maxLoad = maxLoad;
         this.speedOpenDoors = speedOpenDoors;
         this.speedOfMovement = speedOfMovement;
@@ -122,16 +122,12 @@ public class Lift implements Runnable {
         return null;
     }
 
-    public void summon(Goal goal) {
+    public void callOnElevator(Goal goal) {
         points.add(goal.getFloorNumber());
         direction = goal.getDirection();
         log.info("лифт вызывается на {} этаж", goal.getFloorNumber());
     }
 
-    public void addPoint(int point) {
-        points.add(point);
-        log.info("лифт вызывается на {} этаж", point);
-    }
 
     public boolean isOccupied() {
         return points.size() > 0 ? true : false;
@@ -149,18 +145,18 @@ public class Lift implements Runnable {
 
     @Override
     public void run() {
-        while (!isInterupted()) {
+        while (!isInterrupted()) {
             onFloor();
             move();
         }
     }
 
-    public boolean isInterupted() {
-        return isInterupted;
+    public boolean isInterrupted() {
+        return isInterrupted;
     }
 
-    public void setInterupted(boolean interupted) {
-        isInterupted = interupted;
+    public void setInterrupted(boolean interrupted) {
+        isInterrupted = interrupted;
     }
 }
 

@@ -6,7 +6,6 @@ import building.floors.Floor;
 import building.floors.StandartFloor;
 import lombok.extern.slf4j.Slf4j;
 import passengers.Passenger;
-import service.GeneratorPassengers;
 import service.Goal;
 
 
@@ -15,17 +14,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-public class House {
+public class House implements Runnable{
     private final Queue<Goal> goals;
     private final List<Floor> floors;
-    private final Set<Lift> lifts;
-    private final GeneratorPassengers generator;
+    private final Set<Elevator> elevators;
+    //private final GeneratorPassengers generator;
 
     public House(int countFloors, int countLifts, int maxLoad, int doorsSpeed, int liftSpeed) {
         this.floors = generateFloors(countFloors);
-        this.lifts = generateLifts(countLifts, maxLoad, doorsSpeed, liftSpeed);
+        this.elevators = generateLifts(countLifts, maxLoad, doorsSpeed, liftSpeed);
         this.goals= new LinkedList<>();
-        this.generator = new GeneratorPassengers(countFloors);
+        //this.generator = new GeneratorPassengers(countFloors);
     }
     public List<Floor> getFloors(){
         return floors;
@@ -41,8 +40,8 @@ public class House {
     }
 
 
-    private Set<Lift> generateLifts(int count, int maxLoad, int doorsSpeed, int liftSpeed) {
-        return Stream.iterate(0, n -> n + 1).limit(count).map(n->new Lift(maxLoad, doorsSpeed, liftSpeed,floors,goals)).collect(Collectors.toSet());
+    private Set<Elevator> generateLifts(int count, int maxLoad, int doorsSpeed, int liftSpeed) {
+        return Stream.iterate(0, n -> n + 1).limit(count).map(n->new Elevator(maxLoad, doorsSpeed, liftSpeed,floors,goals)).collect(Collectors.toSet());
     }
     public void addPeople(Passenger passenger){
         Goal goal = new Goal(passenger);
@@ -53,31 +52,40 @@ public class House {
         floor.newPeople(passenger);
     }
 
-    public void start() throws InterruptedException {
-        int i = 0;
-        while (true){
-            i++;
-            Thread.sleep(1000);
-            dispatcher();
-            if(i%3==0) addPeople(generator.getRandomPassenger());
-            for (Lift lift:lifts){
-                lift.onFloor();
-                   lift.move();
-            }
-        }
-    }
+
 
 
     public void dispatcher(){
-        while (lifts.stream().filter(lift -> !lift.isOccupied() ).count()>0&&goals.size()>0){
-            for (Lift lift:lifts){
-                if(!lift.isOccupied()){
-                    lift.summon(goals.poll());
+        while (elevators.stream().filter(elevator -> !elevator.isOccupied() ).count()>0&&goals.size()>0){
+            for (Elevator elevator : elevators){
+                if(!elevator.isOccupied()){
+                    elevator.callOnElevator(goals.poll());
                     break;
                 }
             }
         }
 
+    }
+    public void start1() throws InterruptedException {
+        int i = 0;
+        while (true){
+            i++;
+            Thread.sleep(1000);
+            dispatcher();
+            //if(i%3==0) addPeople(generator.getRandomPassenger());
+            for (Elevator elevator : elevators){
+                elevator.onFloor();
+                elevator.move();
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        elevators.stream().forEach(elevator ->new Thread(elevator).start());
+        while (true){
+            dispatcher();
+        }
     }
 }
 
