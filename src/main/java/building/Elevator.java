@@ -44,14 +44,16 @@ public class Elevator implements Runnable {
     }
 
     public Optional<Goal> load(Queue<Passenger> passengerQueue) {
-        while (loadOne(passengerQueue.peek())) {
-            Passenger passenger = passengerQueue.poll();
-            log.warn("в лифт на {} этаже входит пассажир", position);
-            points.add(passenger.getRequiredFloor());
+        synchronized (passengerQueue) {
+            while (loadOne(passengerQueue.peek())) {
+                Passenger passenger = passengerQueue.poll();
+                log.warn("в лифт на {} этаже входит пассажир", position);
+                points.add(passenger.getRequiredFloor());
+            }
+            if (passengerQueue.size() > 0) {
+                return Optional.of(new Goal(passengerQueue.peek()));
+            } else return Optional.empty();
         }
-        if (passengerQueue.size() > 0) {
-            return Optional.of(new Goal(passengerQueue.peek()));
-        } else return Optional.empty();
     }
 
     private boolean loadOne(Passenger passenger) {
@@ -97,9 +99,9 @@ public class Elevator implements Runnable {
 
     public void move() {
         try {
-            Thread.sleep(speedOfMovement*1000);
+            Thread.sleep(speedOfMovement * 1000);
         } catch (InterruptedException e) {
-            log.error("лифт застрял",e);
+            log.error("лифт застрял", e);
         }
         if (liftDirection().equals(Direction.DOWN)) moveDown();
         if (liftDirection().equals(Direction.UP)) moveUp();
@@ -111,7 +113,9 @@ public class Elevator implements Runnable {
             points.remove(getPosition());
             unload();
             Optional<Goal> goal = load(getCurrentFloor().getQuery(direction));
-            if (goal.isPresent()) goals.add(goal.get());
+            synchronized (goals) {
+                if (goal.isPresent()) goals.add(goal.get());
+            }
         }
     }
 

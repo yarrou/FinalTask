@@ -10,10 +10,10 @@ import java.util.Queue;
 
 @Getter
 @Slf4j
-public class StandartFloor extends Floor {
+public class StandardFloor extends Floor {
     private final int number;
 
-    public StandartFloor(int number) {
+    public StandardFloor(int number) {
         this.number = number;
         this.passengersToUp = new LinkedList<>();
         this.passengersToDown = new LinkedList<>();
@@ -24,11 +24,15 @@ public class StandartFloor extends Floor {
 
     public void newPeople(Passenger passenger) {
         if (passenger.getRequiredFloor() - passenger.getFromFloor() > 0) {
-            passengersToUp.add(passenger);
-            log.info("пассажир встал в очередь на верх на {} этаже", number);
+            synchronized (passengersToUp) {
+                passengersToUp.add(passenger);
+                log.info("пассажир встал в очередь на верх на {} этаже", number);
+            }
         } else {
-            passengersToDown.add(passenger);
-            log.info("пассажир встал в очередь на низ на {} этаже", number);
+            synchronized (passengersToDown) {
+                passengersToDown.add(passenger);
+                log.info("пассажир встал в очередь на низ на {} этаже", number);
+            }
         }
 
     }

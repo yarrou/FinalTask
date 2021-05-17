@@ -6,20 +6,26 @@ import service.Direction;
 
 import java.util.LinkedList;
 import java.util.Queue;
+
 @Slf4j
-public class EndFloor extends Floor{
+public class EndFloor extends Floor {
     private final int number;
     private final Queue<Passenger> passengers;
+
     public EndFloor(int number) {
-        this.number=number;
+        this.number = number;
         this.passengers = new LinkedList<Passenger>();
     }
-    public int getNumber(){
+
+    public int getNumber() {
         return number;
     }
-    public void newPeople(Passenger passenger){
-        log.info("пассажир стал в очередь на низ на {} этаже",number);
-        passengers.add(passenger);
+
+    public void newPeople(Passenger passenger) {
+        synchronized (passengers) {
+            log.info("пассажир стал в очередь на низ на {} этаже", number);
+            passengers.add(passenger);
+        }
     }
 
     @Override
