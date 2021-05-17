@@ -1,6 +1,7 @@
 package building;
 
 import building.floors.Floor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import passengers.Passenger;
 import service.Goal;
@@ -110,9 +111,11 @@ public class Elevator implements Runnable {
     public void onFloor() {
 
         if (points.contains(getPosition())) {
+            openDoors();
             points.remove(getPosition());
             unload();
             Optional<Goal> goal = load(getCurrentFloor().getQuery(direction));
+            closeDoors();
             synchronized (goals) {
                 if (goal.isPresent()) goals.add(goal.get());
             }
@@ -161,6 +164,18 @@ public class Elevator implements Runnable {
 
     public void setInterrupted(boolean interrupted) {
         isInterrupted = interrupted;
+    }
+
+    @SneakyThrows
+    private void openDoors() {
+        Thread.sleep(speedOpenDoors * 1000);
+        log.info("двери открываются");
+    }
+
+    @SneakyThrows
+    private void closeDoors() {
+        Thread.sleep(speedOpenDoors * 1000);
+        log.info("двери закрываются");
     }
 }
 
