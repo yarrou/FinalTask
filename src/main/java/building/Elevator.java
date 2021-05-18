@@ -54,7 +54,7 @@ public class Elevator implements Runnable {
         synchronized (passengerQueue) {
             while (loadOne(passengerQueue.peek())) {
                 Passenger passenger = passengerQueue.poll();
-                log.warn("в лифт на {} этаже входит пассажир", position);
+                log.warn("в лифт №{} на {} этаже входит пассажир", id, position);
                 points.add(passenger.getRequiredFloor());
             }
             if (passengerQueue.size() > 0) {
@@ -79,8 +79,8 @@ public class Elevator implements Runnable {
             Passenger passenger = iterator.next();
             if (passenger.getRequiredFloor() == position) {
                 iterator.remove();
-                log.warn("пассажир покинул лифт на {} этаже", position);
-                collector.event(passenger,id);
+                log.warn("пассажир покинул лифт №{} на {} этаже", id, position);
+                collector.event(passenger, id);
             }
         }
     }
@@ -88,12 +88,10 @@ public class Elevator implements Runnable {
 
     public void moveUp() {
         position++;
-        log.info("лифт приехал на {} этаж", position);
     }
 
     public void moveDown() {
         position--;
-        log.info("лифт приехал на {} этаж", position);
     }
 
     public Direction liftDirection() {
@@ -118,6 +116,7 @@ public class Elevator implements Runnable {
     public void onFloor() {
 
         if (points.contains(getPosition())) {
+            log.info("лифт №{} приехал на {} этаж", id, position);
             openDoors();
             points.remove(getPosition());
             unload();
@@ -177,13 +176,11 @@ public class Elevator implements Runnable {
     @SneakyThrows
     private void openDoors() {
         Thread.sleep(speedOpenDoors * 1000);
-        log.info("двери открываются");
     }
 
     @SneakyThrows
     private void closeDoors() {
         Thread.sleep(speedOpenDoors * 1000);
-        log.info("двери закрываются");
     }
 }
 

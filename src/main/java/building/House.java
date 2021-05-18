@@ -4,6 +4,7 @@ import building.floors.EndFloor;
 import building.floors.FirstFloor;
 import building.floors.Floor;
 import building.floors.StandardFloor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import passengers.Passenger;
 import service.Goal;
@@ -73,10 +74,12 @@ public class House implements Runnable {
 
     }
 
+    @SneakyThrows
     @Override
     public void run() {
         elevators.stream().forEach(elevator -> new Thread(elevator).start());
         while (true) {
+            Thread.sleep(100);
             dispatcher();
         }
     }

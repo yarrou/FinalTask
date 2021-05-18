@@ -28,7 +28,7 @@ public class ElevatorStatistic {
                 "лифт №" + number +
                         " перевез " + countPassengers +
                         " пассажиров " +
-                        "общей массой " + totalWeight
+                        "общей массой " + totalWeight+ " kg"
                 ;
     }
 }
