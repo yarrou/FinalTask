@@ -24,11 +24,11 @@ public class GeneratorPassengers implements Runnable {
     }
 
     private int getRandomNumberFloor(int max) {
-        return (int) ((Math.random() * (max - 1)) + 1);
+        return (int) ((Math.random() * (max)) + 1);
     }
 
     private int getRandomWeight() {
-        return (int) ((Math.random() * (120 - 40)) + 40);
+        return (int) ((Math.random() * (110 - 40)) + 40);
     }
 
     @SneakyThrows

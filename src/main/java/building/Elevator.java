@@ -6,12 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import passengers.Passenger;
 import service.Goal;
 import service.Direction;
+import statistic.StatisticsCollector;
 
 import java.util.*;
 
 @Slf4j
 public class Elevator implements Runnable {
 
+    private final int id;
     private boolean isInterrupted;
     private final Queue<Goal> goals;
     private final int maxLoad;
@@ -22,13 +24,15 @@ public class Elevator implements Runnable {
     private final int speedOpenDoors;
     private final int speedOfMovement;
     private SortedSet<Integer> points;
+    private final StatisticsCollector collector;
 
     private int getWorkLoad() {
         return passengers.stream().map((passenger) -> passenger.getWeight()).reduce((weight, weightNextPassenger) -> weight + weightNextPassenger).orElse(0);
     }
 
 
-    public Elevator(int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Queue<Goal> goals) {
+    public Elevator(int id, int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Queue<Goal> goals, StatisticsCollector collector) {
+        this.id = id;
         this.maxLoad = maxLoad;
         this.speedOpenDoors = speedOpenDoors;
         this.speedOfMovement = speedOfMovement;
@@ -38,6 +42,8 @@ public class Elevator implements Runnable {
         this.direction = Direction.STOP;
         this.points = new TreeSet<>();
         this.goals = goals;
+        this.collector = collector;
+        collector.initElevator(id);
     }
 
     public int getPosition() {
@@ -74,6 +80,7 @@ public class Elevator implements Runnable {
             if (passenger.getRequiredFloor() == position) {
                 iterator.remove();
                 log.warn("пассажир покинул лифт на {} этаже", position);
+                collector.event(passenger,id);
             }
         }
     }
@@ -143,6 +150,7 @@ public class Elevator implements Runnable {
     @Override
     public String toString() {
         return "Lift{" +
+                " id=" + id +
                 ", move=" + direction +
                 ",count passengers=" + passengers.size() +
                 ", position=" + position +

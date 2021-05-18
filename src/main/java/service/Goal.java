@@ -6,14 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 import passengers.Passenger;
 
-
+// класс представляющий задачу для вызова лифта
 @Getter
-@Setter @EqualsAndHashCode @AllArgsConstructor
+@Setter
+@EqualsAndHashCode
+@AllArgsConstructor
 public class Goal {
     private final Direction direction;
     private final int floorNumber;
-    public Goal(Passenger passenger){
+
+    public Goal(Passenger passenger) {
         this.floorNumber = passenger.getFromFloor();
-        this.direction =passenger.getFromFloor()<passenger.getRequiredFloor()? Direction.UP: Direction.DOWN;
+        this.direction = passenger.getFromFloor() < passenger.getRequiredFloor() ? Direction.UP : Direction.DOWN;
     }
 }

@@ -7,6 +7,7 @@ import building.floors.StandardFloor;
 import lombok.extern.slf4j.Slf4j;
 import passengers.Passenger;
 import service.Goal;
+import statistic.StatisticsCollector;
 
 
 import java.util.*;
@@ -18,12 +19,14 @@ public class House implements Runnable {
     private final Queue<Goal> goals;
     private final List<Floor> floors;
     private final Set<Elevator> elevators;
+    private final StatisticsCollector collector;
 
 
     public House(int countFloors, int countLifts, int maxLoad, int doorsSpeed, int liftSpeed) {
+        this.collector = new StatisticsCollector();
         this.goals = new LinkedList<>();
         this.floors = generateFloors(countFloors);
-        this.elevators = generateLifts(countLifts, maxLoad, doorsSpeed, liftSpeed);
+        this.elevators = generateLifts(countLifts, maxLoad, doorsSpeed, liftSpeed, collector);
 
     }
 
@@ -37,12 +40,13 @@ public class House implements Runnable {
         genfloors.add(new FirstFloor());
         Stream.iterate(2, n -> n + 1).limit(count - 2).forEach(x -> genfloors.add(new StandardFloor(x)));
         genfloors.add(new EndFloor(count));
+        genfloors.stream().forEach(x ->collector.initFloor(x.getNumber()));
         return genfloors;
     }
 
 
-    private Set<Elevator> generateLifts(int count, int maxLoad, int doorsSpeed, int liftSpeed) {
-        return Stream.iterate(0, n -> n + 1).limit(count).map(n -> new Elevator(maxLoad, doorsSpeed, liftSpeed, floors, goals)).collect(Collectors.toSet());
+    private Set<Elevator> generateLifts(int count, int maxLoad, int doorsSpeed, int liftSpeed, StatisticsCollector collector) {
+        return Stream.iterate(0, n -> n + 1).limit(count).map(n -> new Elevator(n+1, maxLoad, doorsSpeed, liftSpeed, floors, goals, collector)).collect(Collectors.toSet());
     }
 
     public void addPeople(Passenger passenger) {
@@ -67,20 +71,6 @@ public class House implements Runnable {
             }
         }
 
-    }
-
-    public void start1() throws InterruptedException {
-        int i = 0;
-        while (true) {
-            i++;
-            Thread.sleep(1000);
-            dispatcher();
-            //if(i%3==0) addPeople(generator.getRandomPassenger());
-            for (Elevator elevator : elevators) {
-                elevator.onFloor();
-                elevator.move();
-            }
-        }
     }
 
     @Override
