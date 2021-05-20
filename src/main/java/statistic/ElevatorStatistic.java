@@ -2,7 +2,6 @@ package statistic;
 
 import passengers.Passenger;
 
-import java.util.Objects;
 
 public class ElevatorStatistic {
     private final int number;
@@ -28,7 +27,7 @@ public class ElevatorStatistic {
                 "лифт №" + number +
                         " перевез " + countPassengers +
                         " пассажиров " +
-                        "общей массой " + totalWeight+ " kg"
+                        "общей массой " + totalWeight + " kg"
                 ;
     }
 }

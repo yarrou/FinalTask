@@ -15,20 +15,16 @@ public class Elevator implements Runnable {
 
     private final int id;
     private boolean isInterrupted;
-    private final Queue<Goal> goals;
+    private final Queue<Goal> goals;//общая очередь вызовов лифта в здании
     private final int maxLoad;
     private final List<Floor> floors;
-    private Direction direction;
+    private Direction requiredDirection;//указатель направления движения после загрузки пассажира, не является фактическим направлением движения
     Set<Passenger> passengers;
     private int position;
     private final int speedOpenDoors;
     private final int speedOfMovement;
     private SortedSet<Integer> points;
     private final StatisticsCollector collector;
-
-    private int getWorkLoad() {
-        return passengers.stream().map((passenger) -> passenger.getWeight()).reduce((weight, weightNextPassenger) -> weight + weightNextPassenger).orElse(0);
-    }
 
 
     public Elevator(int id, int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Queue<Goal> goals, StatisticsCollector collector) {
@@ -39,17 +35,41 @@ public class Elevator implements Runnable {
         this.position = 1;
         this.passengers = new HashSet<>();
         this.floors = floors;
-        this.direction = Direction.STOP;
+        this.requiredDirection = Direction.STOP;
         this.points = new TreeSet<>();
         this.goals = goals;
         this.collector = collector;
         collector.initElevator(id);
     }
 
+    public int getWorkLoad() {
+        return passengers.stream().map((passenger) -> passenger.getWeight()).reduce((weight, weightNextPassenger) -> weight + weightNextPassenger).orElse(0);
+    }
+
+    public int getMaxLoad() {
+        return maxLoad;
+    }
+
     public int getPosition() {
         return position;
     }
 
+    public int countPassengers() {
+        return passengers.size();
+    }
+
+    public Set<Integer> getPoints() {
+        return Set.copyOf(points);
+    }
+    public void newStatisticEvent(Passenger passenger){
+        collector.event(passenger,id);
+    }
+
+    public Direction getRequiredDirection() {
+        return requiredDirection;
+    }
+
+    // если в очереди остались пассажиры создается новая задача
     public Optional<Goal> load(Queue<Passenger> passengerQueue) {
         synchronized (passengerQueue) {
             while (loadOne(passengerQueue.peek())) {
@@ -80,7 +100,7 @@ public class Elevator implements Runnable {
             if (passenger.getRequiredFloor() == position) {
                 iterator.remove();
                 log.warn("пассажир покинул лифт №{} на {} этаже", id, position);
-                collector.event(passenger, id);
+                newStatisticEvent(passenger);
             }
         }
     }
@@ -94,7 +114,7 @@ public class Elevator implements Runnable {
         position--;
     }
 
-    public Direction liftDirection() {
+    public Direction elevatorDirection() {
         if (points.size() > 0) {
             if (points.last() > position) return Direction.UP;
             else if (points.last() < position) return Direction.DOWN;
@@ -109,8 +129,8 @@ public class Elevator implements Runnable {
         } catch (InterruptedException e) {
             log.error("лифт застрял", e);
         }
-        if (liftDirection().equals(Direction.DOWN)) moveDown();
-        if (liftDirection().equals(Direction.UP)) moveUp();
+        if (elevatorDirection().equals(Direction.DOWN)) moveDown();
+        if (elevatorDirection().equals(Direction.UP)) moveUp();
     }
 
     public void onFloor() {
@@ -120,7 +140,7 @@ public class Elevator implements Runnable {
             openDoors();
             points.remove(getPosition());
             unload();
-            Optional<Goal> goal = load(getCurrentFloor().getQuery(direction));
+            Optional<Goal> goal = load(getCurrentFloor().getQuery(requiredDirection));
             closeDoors();
             synchronized (goals) {
                 if (goal.isPresent()) goals.add(goal.get());
@@ -137,7 +157,7 @@ public class Elevator implements Runnable {
 
     public void callOnElevator(Goal goal) {
         points.add(goal.getFloorNumber());
-        direction = goal.getDirection();
+        requiredDirection = goal.getDirection();
         log.info("лифт вызывается на {} этаж", goal.getFloorNumber());
     }
 
@@ -150,7 +170,7 @@ public class Elevator implements Runnable {
     public String toString() {
         return "Lift{" +
                 " id=" + id +
-                ", move=" + direction +
+                ", move=" + requiredDirection +
                 ",count passengers=" + passengers.size() +
                 ", position=" + position +
                 ", points=" + points.size() +
