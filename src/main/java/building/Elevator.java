@@ -4,6 +4,7 @@ import building.floors.Floor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import passengers.Passenger;
+import service.Dispatcher;
 import service.Goal;
 import service.Direction;
 import statistic.StatisticsCollector;
@@ -15,7 +16,7 @@ public class Elevator implements Runnable {
 
     private final int id;
     private boolean isInterrupted;
-    private final Queue<Goal> goals;//общая очередь вызовов лифта в здании
+    private final Dispatcher dispatcher;//private final Queue<Goal> goals;//общая очередь вызовов лифта в здании
     private final int maxLoad;
     private final List<Floor> floors;
     private Direction requiredDirection;//указатель направления движения после загрузки пассажира, не является фактическим направлением движения
@@ -27,7 +28,7 @@ public class Elevator implements Runnable {
     private final StatisticsCollector collector;
 
 
-    public Elevator(int id, int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Queue<Goal> goals, StatisticsCollector collector) {
+    public Elevator(int id, int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Dispatcher dispatcher, StatisticsCollector collector) {
         this.id = id;
         this.maxLoad = maxLoad;
         this.speedOpenDoors = speedOpenDoors;
@@ -37,7 +38,7 @@ public class Elevator implements Runnable {
         this.floors = floors;
         this.requiredDirection = Direction.STOP;
         this.points = new TreeSet<>();
-        this.goals = goals;
+        this.dispatcher = dispatcher;
         this.collector = collector;
         collector.initElevator(id);
     }
@@ -61,8 +62,9 @@ public class Elevator implements Runnable {
     public Set<Integer> getPoints() {
         return Set.copyOf(points);
     }
-    public void newStatisticEvent(Passenger passenger){
-        collector.event(passenger,id);
+
+    public void newStatisticEvent(Passenger passenger) {
+        collector.event(passenger, id);
     }
 
     public Direction getRequiredDirection() {
@@ -133,17 +135,18 @@ public class Elevator implements Runnable {
         if (elevatorDirection().equals(Direction.UP)) moveUp();
     }
 
-    public void onFloor() {
-
-        if (points.contains(getPosition())) {
-            log.info("лифт №{} приехал на {} этаж", id, position);
-            openDoors();
-            points.remove(getPosition());
-            unload();
-            Optional<Goal> goal = load(getCurrentFloor().getQuery(requiredDirection));
-            closeDoors();
-            synchronized (goals) {
-                if (goal.isPresent()) goals.add(goal.get());
+    @SneakyThrows
+    public  void onFloor() {
+        synchronized (dispatcher) {
+            if (!isOccupied()) dispatcher.wait();
+            if (points.contains(getPosition())) {
+                log.info("лифт №{} приехал на {} этаж", id, position);
+                openDoors();
+                points.remove(getPosition());
+                unload();
+                Optional<Goal> goal = load(getCurrentFloor().getQuery(requiredDirection));
+                closeDoors();
+                if (goal.isPresent()) dispatcher.addGoal(goal.get());
             }
         }
     }
@@ -177,9 +180,11 @@ public class Elevator implements Runnable {
                 '}';
     }
 
+    @SneakyThrows
     @Override
     public void run() {
         while (!isInterrupted()) {
+            log.info("№" + id);
             onFloor();
             move();
         }
