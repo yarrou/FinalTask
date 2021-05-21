@@ -184,7 +184,6 @@ public class Elevator implements Runnable {
     @Override
     public void run() {
         while (!isInterrupted()) {
-            log.info("№" + id);
             onFloor();
             move();
         }
