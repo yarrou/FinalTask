@@ -1,26 +1,28 @@
 package service;
 
-import building.Elevator;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class Dispatcher {
     private Queue<Goal> goals;
 
-    public Dispatcher(){
+    public Dispatcher() {
         goals = new LinkedList<>();
     }
-    public Queue<Goal> getGoals(){
+
+    public Queue<Goal> getGoals() {
         return goals;
     }
-    public void addGoal(Goal goal){
+
+    public void addGoal(Goal goal) {
         goals.add(goal);
     }
-    public Goal getGoal(){
+
+    public Goal getGoal() {
         return goals.poll();
     }
-    public boolean isThereGoal(){
-        return goals.size()>0?true:false;
+
+    public boolean isThereGoal() {
+        return goals.size() > 0 ? true : false;
     }
 }

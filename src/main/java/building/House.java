@@ -43,6 +43,9 @@ public class House implements Runnable {
     public List<Floor> getFloors() {
         return floors;
     }
+    public int countFloors(){
+        return floors.size();
+    }
 
 
     private List<Floor> generateFloors(int count) {
@@ -70,6 +73,7 @@ public class House implements Runnable {
         floor.newPeople(passenger);
     }
 
+    //метод проверяет есть ли задачи и свободные лифты, при наличии "будит" лифт и отправляет его по заявке
     public void scanner() {
         while (elevators.stream().filter(elevator -> !elevator.isOccupied()).count() > 0 && dispatcher.isThereGoal()) {
             for (Elevator elevator : elevators) {
@@ -89,7 +93,7 @@ public class House implements Runnable {
     public void run() {
         elevators.stream().forEach(elevator -> new Thread(elevator).start());
         while (true) {
-            Thread.sleep(100);
+            Thread.sleep(1000);
             scanner();
         }
     }

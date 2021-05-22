@@ -22,7 +22,12 @@ public class StatisticsCollector {
         this.elevatorsStatistic = new ArrayList<>();
         this.floorsStatistics = new ArrayList<>();
     }
-
+    public List<ElevatorStatistic> getElevatorsStatisticListNow(){
+        return List.copyOf(elevatorsStatistic);
+    }
+    public List<FloorStatistic> getFloorsStatisticsNow(){
+        return List.copyOf(floorsStatistics);
+    }
 
     @SneakyThrows
     public synchronized void event(Passenger passenger, int numberElevator) {

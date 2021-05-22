@@ -1,8 +1,11 @@
 package statistic;
 
+import lombok.Getter;
 import passengers.Passenger;
 
+import java.util.Objects;
 
+@Getter
 public class ElevatorStatistic {
     private final int number;
     private int countPassengers;
@@ -17,10 +20,6 @@ public class ElevatorStatistic {
         totalWeight += passenger.getWeight();
     }
 
-    public int getNumber() {
-        return number;
-    }
-
     @Override
     public String toString() {
         return
@@ -29,5 +28,18 @@ public class ElevatorStatistic {
                         " пассажиров " +
                         "общей массой " + totalWeight + " kg"
                 ;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ElevatorStatistic that = (ElevatorStatistic) o;
+        return number == that.number;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number);
     }
 }

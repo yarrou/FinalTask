@@ -136,9 +136,8 @@ public class Elevator implements Runnable {
     }
 
     @SneakyThrows
-    public  void onFloor() {
+    public void onFloor() {
         synchronized (dispatcher) {
-            if (!isOccupied()) dispatcher.wait();
             if (points.contains(getPosition())) {
                 log.info("лифт №{} приехал на {} этаж", id, position);
                 openDoors();
@@ -147,6 +146,10 @@ public class Elevator implements Runnable {
                 Optional<Goal> goal = load(getCurrentFloor().getQuery(requiredDirection));
                 closeDoors();
                 if (goal.isPresent()) dispatcher.addGoal(goal.get());
+            }
+            if (!isOccupied()) {
+                requiredDirection=Direction.STOP;
+                dispatcher.wait();
             }
         }
     }

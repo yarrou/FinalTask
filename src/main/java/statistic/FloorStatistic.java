@@ -1,5 +1,8 @@
 package statistic;
 
+import lombok.Getter;
+
+@Getter
 public class FloorStatistic {
     private final int number;
     private int countArrived;

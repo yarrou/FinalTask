@@ -14,7 +14,7 @@ public class GeneratorPassengers implements Runnable {
     private final House house;
 
     public Passenger getRandomPassenger() {
-        int maxFloor = house.getFloors().size();
+        int maxFloor = house.countFloors();
         int currentFloor = getRandomNumberFloor(maxFloor);
         int requiredFloor = getRandomNumberFloor(maxFloor);
         while (currentFloor == requiredFloor) {
