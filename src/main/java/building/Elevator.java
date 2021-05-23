@@ -29,7 +29,7 @@ public class Elevator implements Runnable {
 
 
     public Elevator(int id, int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Dispatcher dispatcher, StatisticsCollector collector) {
-        if(maxLoad<120||speedOpenDoors<0||speedOfMovement<0){
+        if(maxLoad<120||speedOpenDoors<1||speedOfMovement<1){
             throw new IllegalArgumentException("невозможно создать лифт с такими параметрами");
         }
         this.id = id;
