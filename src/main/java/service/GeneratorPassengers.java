@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import passengers.Passenger;
 
 /* класс для генеграции пассажиров. Интенсивность генерации задается параметром generationIntensity при создании экземпляра
-класса. Чем меньше парамет, чем чаще генерируются пассажиры
+класса. Чем меньше параметp, чем чаще генерируются пассажиры
  */
 @AllArgsConstructor
 public class GeneratorPassengers implements Runnable {

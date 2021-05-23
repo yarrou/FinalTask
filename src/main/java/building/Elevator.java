@@ -29,7 +29,7 @@ public class Elevator implements Runnable {
 
 
     public Elevator(int id, int maxLoad, int speedOpenDoors, int speedOfMovement, List<Floor> floors, Dispatcher dispatcher, StatisticsCollector collector) {
-        if(maxLoad<120||speedOpenDoors<1||speedOfMovement<1){
+        if (maxLoad < 120 || speedOpenDoors < 1 || speedOfMovement < 1) {
             throw new IllegalArgumentException("невозможно создать лифт с такими параметрами");
         }
         this.id = id;
@@ -147,8 +147,8 @@ public class Elevator implements Runnable {
                 points.remove(getPosition());
                 unload();
                 Optional<Goal> goal = load(getCurrentFloor().getQuery(requiredDirection));
-                if(countPassengers()==0&&points.size()==0){
-                    requiredDirection=Direction.STOP;
+                if (countPassengers() == 0 && points.size() == 0) {
+                    requiredDirection = Direction.STOP;
                     goal = load(getCurrentFloor().getQuery(requiredDirection));
                 }
                 closeDoors();

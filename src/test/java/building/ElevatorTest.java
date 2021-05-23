@@ -43,10 +43,10 @@ class ElevatorTest {
     }
 
     @Test
-    void constructor(){
-        assertThrows(IllegalArgumentException.class,()->new Elevator(1,0,2,2,floors,dispatcher,statisticsCollector));
-        assertThrows(IllegalArgumentException.class,()->new Elevator(1,200,0,2,floors,dispatcher,statisticsCollector));
-        assertThrows(IllegalArgumentException.class,()->new Elevator(1,200,2,0,floors,dispatcher,statisticsCollector));
+    void constructor() {
+        assertThrows(IllegalArgumentException.class, () -> new Elevator(1, 0, 2, 2, floors, dispatcher, statisticsCollector));
+        assertThrows(IllegalArgumentException.class, () -> new Elevator(1, 200, 0, 2, floors, dispatcher, statisticsCollector));
+        assertThrows(IllegalArgumentException.class, () -> new Elevator(1, 200, 2, 0, floors, dispatcher, statisticsCollector));
     }
 
     @Test

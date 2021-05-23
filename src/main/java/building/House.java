@@ -25,17 +25,18 @@ public class House implements Runnable {
 
 
     public House(int countFloors, int countLifts, int maxLoad, int doorsSpeed, int liftSpeed) {
-        if (countFloors<2||countLifts<1){
+        if (countFloors < 2 || countLifts < 1) {
             throw new IllegalArgumentException("невозможно создать дом с такими параметрами");
         }
         this.collector = new StatisticsCollector();
-        this.dispatcher=new Dispatcher();
+        this.dispatcher = new Dispatcher();
         this.floors = generateFloors(countFloors);
         this.elevators = generateLifts(countLifts, maxLoad, doorsSpeed, liftSpeed, collector);
 
 
     }
-    public int countGoals(){
+
+    public int countGoals() {
         return dispatcher.getGoals().size();
     }
 
@@ -46,7 +47,8 @@ public class House implements Runnable {
     public List<Floor> getFloors() {
         return floors;
     }
-    public int countFloors(){
+
+    public int countFloors() {
         return floors.size();
     }
 
@@ -56,13 +58,13 @@ public class House implements Runnable {
         genfloors.add(new FirstFloor());
         Stream.iterate(2, n -> n + 1).limit(count - 2).forEach(x -> genfloors.add(new StandardFloor(x)));
         genfloors.add(new EndFloor(count));
-        genfloors.stream().forEach(x ->collector.initFloor(x.getNumber()));
+        genfloors.stream().forEach(x -> collector.initFloor(x.getNumber()));
         return genfloors;
     }
 
 
     private Set<Elevator> generateLifts(int count, int maxLoad, int doorsSpeed, int liftSpeed, StatisticsCollector collector) {
-        return Stream.iterate(0, n -> n + 1).limit(count).map(n -> new Elevator(n+1, maxLoad, doorsSpeed, liftSpeed, floors, dispatcher, collector)).collect(Collectors.toSet());
+        return Stream.iterate(0, n -> n + 1).limit(count).map(n -> new Elevator(n + 1, maxLoad, doorsSpeed, liftSpeed, floors, dispatcher, collector)).collect(Collectors.toSet());
     }
 
     public void addPeople(Passenger passenger) {
@@ -81,10 +83,11 @@ public class House implements Runnable {
         while (elevators.stream().filter(elevator -> !elevator.isOccupied()).count() > 0 && dispatcher.isThereGoal()) {
             for (Elevator elevator : elevators) {
                 if (!elevator.isOccupied()) {
-                    synchronized (dispatcher){
-                    dispatcher.notify();
-                    elevator.callOnElevator(dispatcher.getGoal());
-                    break;}
+                    synchronized (dispatcher) {
+                        dispatcher.notify();
+                        elevator.callOnElevator(dispatcher.getGoal());
+                        break;
+                    }
                 }
             }
         }
