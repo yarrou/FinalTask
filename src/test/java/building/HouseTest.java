@@ -15,6 +15,7 @@ class HouseTest {
         house = new House(10,1,250,1,3);
     }
 
+
     @Test
     void addPeople() {
         int countGoals = house.countGoals();

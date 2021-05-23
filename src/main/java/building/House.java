@@ -25,6 +25,9 @@ public class House implements Runnable {
 
 
     public House(int countFloors, int countLifts, int maxLoad, int doorsSpeed, int liftSpeed) {
+        if (countFloors<2||countLifts<1){
+            throw new IllegalArgumentException("невозможно создать дом с такими параметрами");
+        }
         this.collector = new StatisticsCollector();
         this.dispatcher=new Dispatcher();
         this.floors = generateFloors(countFloors);

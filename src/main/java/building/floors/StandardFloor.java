@@ -39,6 +39,9 @@ public class StandardFloor extends Floor {
 
     @Override
     public Queue<Passenger> getQuery(Direction direction) {
+        if (direction.equals(Direction.STOP)){
+            return passengersToUp.size()>0?passengersToUp:passengersToDown;
+        }
         return direction.equals(Direction.DOWN) ? passengersToDown : passengersToUp;
     }
 }
